@@ -1,31 +1,31 @@
 version: '3.8'
 
 services:
-  php:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "9090:80"
-    container_name: cash_php
-    volumes:
-      - ./:/usr/share/ngnix
-    networks:
-      - cash_network
+    php:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "9090:80"
+        container_name: cash_php
+        volumes:
+            - ./:/usr/share/nginx
+        networks:
+            - cash_network
 
-  mysql:
-    image: mysql:latest
-    ports:
-      - "3306:3306"
-    container_name: cash_db
-    environment:
-      MYSQL_DATABASE: cash_app
-      MYSQL_ROOT_PASSWORD: Pay_2021
-    volumes:
-      - .dbdocker/dbdata:/var/lib/mysql
-    networks:
-      - cash_network
+    mysql:
+        image: mysql:latest
+        ports:
+            - "3306:3306"
+        container_name: cash_db
+        environment:
+            MYSQL_DATABASE: cash_app
+            MYSQL_ROOT_PASSWORD: Pay_2021
+        volumes:
+            - .dbdocker/dbdata:/var/lib/mysql
+        networks:
+            - cash_network
 
 networks:
-  cash_network:
-    driver: bridge
+    cash_network:
+        driver: bridge
