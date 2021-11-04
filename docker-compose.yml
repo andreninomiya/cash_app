@@ -1,9 +1,5 @@
 version: '3.8'
 
-networks:
-  cash_network:
-    driver: bridge
-
 services:
   php:
     build:
@@ -12,9 +8,8 @@ services:
     ports:
       - "9090:80"
     container_name: cash_php
-    restart: unless-stopped
     volumes:
-      - ./:/var/www/html
+      - ./:/usr/share/ngnix
     networks:
       - cash_network
 
@@ -30,3 +25,7 @@ services:
       - .dbdocker/dbdata:/var/lib/mysql
     networks:
       - cash_network
+
+networks:
+  cash_network:
+    driver: bridge
