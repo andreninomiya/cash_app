@@ -2,28 +2,62 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Users extends Authenticatable
+class Users extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use SoftDeletes;
+
+    protected $table = 'users';
 
     protected $fillable = [
         'name',
+        'cpf',
         'email',
         'password',
+        'fk_type',
+    ];
+
+    protected $dates = [
+        'deleted_at',
+        'created_at',
+        'updated_at'
     ];
 
     protected $hidden = [
         'password',
-        'remember_token',
+        'deleted_at',
+        'pivot'
     ];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    public static function getRules()
+    {
+        return [
+            'name' => 'trim|escape',
+            'cpf' => 'trim|escape',
+            'email' => 'trim|escape|lowercase'
+        ];
+    }
+
+    public static function attributesToUpdate($fromRequest = [])
+    {
+        $editable = [
+            'name',
+            'fk_type',
+        ];
+
+        if (empty($fromRequest))
+            return $editable;
+
+        // Setting only attributes from Update
+        $attributesToUpdate = [];
+        foreach ($fromRequest as $column => $value) {
+            if (in_array($column, $editable)) {
+                $attributesToUpdate[$column] = $value;
+            }
+        }
+
+        return $attributesToUpdate;
+    }
 }
