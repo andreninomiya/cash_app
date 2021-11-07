@@ -11,8 +11,6 @@ RUN ln -s public html
 # CÓPIA DOS ARQUIVOS DO DIRETÓRIO ATUAL PARA O CONTAINER:
 COPY . /usr/share/nginx
 
-RUN sed '/try_files/s/query_string/query_stringssss/g' /etc/nginx/conf.d/default.conf
-
 # ALTERAÇÃO DE PERMISSÃO DA PASTA STORAGE PARA EVITAR ERRO DE ACESSO:
 RUN chmod -R 775 /usr/share/nginx/storage/*
 
