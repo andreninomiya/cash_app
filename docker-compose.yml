@@ -16,7 +16,7 @@ services:
     mysql:
         image: mysql:latest
         ports:
-            - "3306:3306"
+            - "9091:3306"
         container_name: cash_db
         environment:
             MYSQL_DATABASE: cash_app

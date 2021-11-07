@@ -9,7 +9,6 @@ class Controller extends BaseController
 {
     public function index()
     {
-        return ResponseHelper::success("Welcome to ORQUESTRAGOV API 2020", ["version" => "1.0"]);
+        return ResponseHelper::success("Welcome to PicPay CashApp 2021", ["version" => "1.0"]);
     }
-
 }

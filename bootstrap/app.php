@@ -23,9 +23,13 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app->withFacades();
+$app->withFacades();
 
-// $app->withEloquent();
+$app->withEloquent();
+
+if (!class_exists('Sanitizer')) {
+    class_alias(Elegant\Sanitizer\Laravel\Facade::class, 'Sanitizer');
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -61,6 +65,8 @@ $app->singleton(
 
 $app->configure('app');
 
+$app->configure('filesystems');
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -72,9 +78,9 @@ $app->configure('app');
 |
 */
 
-// $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
-// ]);
+$app->middleware([
+    'cors' => App\Http\Middleware\CorsMiddleware::class,
+]);
 
 // $app->routeMiddleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,
@@ -94,6 +100,9 @@ $app->configure('app');
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+
+$app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
+$app->register(Elegant\Sanitizer\Laravel\SanitizerServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

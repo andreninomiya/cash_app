@@ -17,6 +17,7 @@ class CreateUserTypesTable extends Migration
             $table->increments('id');
             $table->string('description', 255);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
