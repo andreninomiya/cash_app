@@ -17,14 +17,19 @@ SSH:
 git clone git@github.com:andreninomiya/cash_app.git
 ```
 
-Criação dos Containers:
+Acessar diretório:
 ``` bash
-docker compose up -d --build
+cd cash_app/
 ```
 
 Cópia .env e alteração de valores (apenas com admin):
 ``` bash
 cp .env.example .env
+```
+
+Criação dos Containers:
+``` bash
+docker compose up -d --build
 ```
 
 Acesso ao Container PHP:
