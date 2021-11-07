@@ -33,25 +33,25 @@ class TransactionsController extends Controller
         // Verifica se o Payer existe
         $payerBalance = UserBalances::find($data['payer']);
         if (empty($payerBalance))
-            return ResponseHelper::exception("Payer not found", 404, true);
+            return ResponseHelper::exception('Payer not found', 404, true);
 
         // Verifica se o Payer é 'Lojista'
         $payer = Users::find($data['payer']);
         if ($payer->fk_type == 2)
-            return ResponseHelper::exception("Payer cannot be Lojista", 404, true);
+            return ResponseHelper::exception('Payer cannot be Lojista', 404, true);
 
         // Verifica se o Payee existe
         $payeeBalance = UserBalances::find($data['payee']);
         if (empty($payeeBalance))
-            return ResponseHelper::exception("Payee not found", 404, true);
+            return ResponseHelper::exception('Payee not found', 404, true);
 
         // Salva os saldos atuais em variáveis
         $currentPayerBalance = $payerBalance->balance;
         $currentPayeeBalance = $payeeBalance->balance;
 
-        // Check if Payer has balance to transfer
+        // Verifica se o Payer possui saldo para transferir
         if ($data['value'] > $currentPayerBalance)
-            return ResponseHelper::exception("Payer-Balance insufficient for transaction", 404, true);
+            return ResponseHelper::exception('Payer-Balance insufficient for transaction', 404, true);
 
         // Executa o serviço autorizador externo
         $externalUrl = 'https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6';
@@ -62,8 +62,8 @@ class TransactionsController extends Controller
         $response_json = json_decode($response, true); // Converte string em json
         curl_close($ch); // Encerra o recurso cURL para liberar os recursos do sistema
 
-        if ($response_json['message'] != "Autorizado")
-            return ResponseHelper::exception("Unauthorized transaction", 404, true);
+        if ($response_json['message'] != 'Autorizado')
+            return ResponseHelper::exception('Unauthorized transaction', 404, true);
 
         // Retira valor do saldo do Payer
         $payerBalance->balance = $currentPayerBalance - $data['value'];
@@ -71,9 +71,9 @@ class TransactionsController extends Controller
 
         // Cria o registro no histórico de saldo do Payer
         UserBalancesHistorical::create([
-            "fk_user" => $data['payer'],
-            "fk_balance" => $payerBalance->id,
-            "balance" => $payerBalance->balance,
+            'fk_user' => $data['payer'],
+            'fk_balance' => $payerBalance->id,
+            'balance' => $payerBalance->balance,
         ]);
 
         // Adiciona valor no saldo do Payee
@@ -82,15 +82,15 @@ class TransactionsController extends Controller
 
         // Cria o registro no histórico de saldo do Payee
         UserBalancesHistorical::create([
-            "fk_user" => $data['payee'],
-            "fk_balance" => $payeeBalance->id,
-            "balance" => $payeeBalance->balance,
+            'fk_user' => $data['payee'],
+            'fk_balance' => $payeeBalance->id,
+            'balance' => $payeeBalance->balance,
         ]);
 
         // Cria o registro da Transação
         Transactions::create($data);
 
-        return ResponseHelper::success("Transaction created");
+        return ResponseHelper::success('Transaction created');
     }
 
     public function update($transactionId)
@@ -98,16 +98,93 @@ class TransactionsController extends Controller
         // Verifica se a Transação existe
         $transaction = Transactions::find($transactionId);
         if (empty($transaction))
-            return ResponseHelper::exception("Transaction not found", 404, true);
+            return ResponseHelper::exception('Transaction not found', 404, true);
+
+        // Busca o Saldo do Payer e verifica se existe
+        $payerBalance = UserBalances::where(['fk_user' => $transaction->payer])->first();
+        if (empty($payerBalance))
+            return ResponseHelper::exception('Payer not found', 404, true);
+
+        // Busca o Saldo do Payee e verifica se existe
+        $payeeBalance = UserBalances::where('fk_user', $transaction->payee)->first();
+        if (empty($payeeBalance))
+            return ResponseHelper::exception('Payee not found', 404, true);
+
+        // Salva os saldos atuais em variáveis
+        $currentPayerBalance = $payerBalance->balance;
+        $currentPayeeBalance = $payeeBalance->balance;
 
         // Formata valores da requisição
         $data = \Sanitizer::make(Transactions::attributesToUpdate($this->request->all()), Transactions::getRules())->sanitize();
+
+        // Convert string em float e verifica se o valor é zero
+        if (floatval($data['value']) == 0)
+            return ResponseHelper::exception('Value invalid', 404, true);
+
+        // Calcula a diferença entre o novo valor e o valor atual da transação
+        $valueDiff = $data['value'] - $transaction->value;
+
+        // Verifica se a diferença é positiva (retirada de mais valor do saldo do Payer)
+        if ($valueDiff > 0) {
+
+            // Verifica se o Payer possui saldo para transferir
+            if ($data['value'] > $currentPayerBalance)
+                return ResponseHelper::exception('Payer-Balance insufficient for transaction', 404, true);
+
+            // Retira valor da diferença do saldo do Payer
+            $payerBalance->balance = $currentPayerBalance - $valueDiff;
+            $payerBalance->save();
+
+            // Cria o registro no histórico de saldo do Payer
+            UserBalancesHistorical::create([
+                'fk_user' => $payerBalance->fk_user,
+                'fk_balance' => $payerBalance->id,
+                'balance' => $payerBalance->balance,
+            ]);
+
+            // Adiciona valor da diferença no saldo do Payee
+            $payeeBalance->balance = $currentPayeeBalance + $valueDiff;
+            $payeeBalance->save();
+
+            // Cria o registro no histórico de saldo do Payee
+            UserBalancesHistorical::create([
+                'fk_user' => $payeeBalance->fk_user,
+                'fk_balance' => $payeeBalance->id,
+                'balance' => $payeeBalance->balance,
+            ]);
+
+        } else {
+            // Senão, a diferença é negativa (entrada de dinheiro no saldo do Payer)
+
+            // Adiciona valor da diferença no saldo do Payer
+            $payerBalance->balance = $currentPayerBalance + abs($valueDiff);
+            $payerBalance->save();
+
+            // Cria o registro no histórico de saldo do Payer
+            UserBalancesHistorical::create([
+                'fk_user' => $payerBalance->fk_user,
+                'fk_balance' => $payerBalance->id,
+                'balance' => $payerBalance->balance,
+            ]);
+
+            // Retira valor da diferença do saldo do Payee
+            $payeeBalance->balance = $currentPayeeBalance - abs($valueDiff);
+            $payeeBalance->save();
+
+            // Cria o registro no histórico de saldo do Payee
+            UserBalancesHistorical::create([
+                'fk_user' => $payeeBalance->fk_user,
+                'fk_balance' => $payeeBalance->id,
+                'balance' => $payeeBalance->balance,
+            ]);
+
+        }
 
         // Salva as atualizações recebidas
         $transaction->fill($data);
         $transaction->save();
 
-        return ResponseHelper::success("Transaction updated");
+        return ResponseHelper::success('Transaction updated');
     }
 
     public function show($transactionId)
@@ -115,10 +192,10 @@ class TransactionsController extends Controller
         // Verifica se a Transação existe
         $transaction = Transactions::find($transactionId);
         if (empty($transaction))
-            return ResponseHelper::exception("Transaction not found", 404, true);
+            return ResponseHelper::exception('Transaction not found', 404, true);
 
         // Retorna o registro da Transação
-        return ResponseHelper::success("Transaction to show", $transaction->toArray());
+        return ResponseHelper::success('Transaction to show', $transaction->toArray());
     }
 
     public function getAll()
@@ -126,7 +203,7 @@ class TransactionsController extends Controller
         // Retorna todos os registros
         $transactions = Transactions::all()->toArray();
 
-        return ResponseHelper::success("All transactions", $transactions);
+        return ResponseHelper::success('All transactions', $transactions);
     }
 
     public function delete($transactionId)
@@ -134,15 +211,15 @@ class TransactionsController extends Controller
         // Verifica se a Transação existe
         $transaction = Transactions::find($transactionId);
         if (empty($transaction))
-            return ResponseHelper::exception("Transaction not found", 404, true);
+            return ResponseHelper::exception('Transaction not found', 404, true);
 
         // Realiza soft delete da Transação
         $removed = Transactions::destroy($transaction->id);
 
         // Verifica se a Transação foi deletada
         if ($removed == 0)
-            return ResponseHelper::exception("Transaction not deleted", 402, true);
+            return ResponseHelper::exception('Transaction not deleted', 402, true);
 
-        return ResponseHelper::success("Transaction deleted");
+        return ResponseHelper::success('Transaction deleted');
     }
 }

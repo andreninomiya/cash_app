@@ -30,14 +30,14 @@ class UsersController extends Controller
         $data = \Sanitizer::make($this->request->all(), Users::getRules())->sanitize();
 
         // Verifica se o CPF/CNPJ já existe no cadastro de algum usuário
-        $userCpf = Users::where("cpf_cnpj", $data["cpf_cnpj"])->first();
+        $userCpf = Users::where('cpf_cnpj', $data['cpf_cnpj'])->first();
         if (!empty($userCpf))
-            return ResponseHelper::exception("CPF-CNPJ already registered", 404, true);
+            return ResponseHelper::exception('CPF-CNPJ already registered', 404, true);
 
         // Verifica se o Email já existe no cadastro de algum usuário
-        $userEmail = Users::where("email", $data["email"])->first();
+        $userEmail = Users::where('email', $data['email'])->first();
         if (!empty($userEmail))
-            return ResponseHelper::exception("Email already registered", 404, true);
+            return ResponseHelper::exception('Email already registered', 404, true);
 
         // Criptografa a senha com 'password_hash'
         $data['password'] = password_hash($data['password'],PASSWORD_DEFAULT);
@@ -45,7 +45,7 @@ class UsersController extends Controller
         // Cria o registro do Usuário
         Users::create($data);
 
-        return ResponseHelper::success("User created");
+        return ResponseHelper::success('User created');
     }
 
     public function update($userId)
@@ -53,7 +53,7 @@ class UsersController extends Controller
         // Verifica se o Usuário existe
         $user = Users::find($userId);
         if (empty($user))
-            return ResponseHelper::exception("User not found", 404, true);
+            return ResponseHelper::exception('User not found', 404, true);
 
         // Formata valores da requisição
         $data = \Sanitizer::make(Users::attributesToUpdate($this->request->all()), Users::getRules())->sanitize();
@@ -62,7 +62,7 @@ class UsersController extends Controller
         $user->fill($data);
         $user->save();
 
-        return ResponseHelper::success("User updated");
+        return ResponseHelper::success('User updated');
     }
 
     public function show($userId)
@@ -70,10 +70,10 @@ class UsersController extends Controller
         // Verifica se o Saldo existe
         $user = Users::find($userId);
         if (empty($user))
-            return ResponseHelper::exception("User not found", 404, true);
+            return ResponseHelper::exception('User not found', 404, true);
 
         // Retorna o registro do Usuário
-        return ResponseHelper::success("User to show", $user->toArray());
+        return ResponseHelper::success('User to show', $user->toArray());
     }
 
     public function getAll()
@@ -81,7 +81,7 @@ class UsersController extends Controller
         // Retorna todos os registros
         $users = Users::all()->toArray();
 
-        return ResponseHelper::success("All users", $users);
+        return ResponseHelper::success('All users', $users);
     }
 
     public function delete($userId)
@@ -89,15 +89,15 @@ class UsersController extends Controller
         // Verifica se o Usuário existe
         $user = Users::find($userId);
         if (empty($user))
-            return ResponseHelper::exception("User not found", 404, true);
+            return ResponseHelper::exception('User not found', 404, true);
 
         // Realiza soft delete do Usuário
         $removed = Users::destroy($user->id);
 
         // Verifica se o Usuário foi deletado
         if ($removed == 0)
-            return ResponseHelper::exception("User not deleted", 402, true);
+            return ResponseHelper::exception('User not deleted', 402, true);
 
-        return ResponseHelper::success("User deleted");
+        return ResponseHelper::success('User deleted');
     }
 }

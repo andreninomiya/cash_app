@@ -28,7 +28,7 @@ class UserTypesController extends Controller
         // Cria o registro do Tipo de Usuário
         UserTypes::create($data);
 
-        return ResponseHelper::success("User-Type created");
+        return ResponseHelper::success('User-Type created');
     }
 
     public function update($typeId)
@@ -36,7 +36,7 @@ class UserTypesController extends Controller
         // Verifica se o Tipo de Usuário existe
         $type = UserTypes::find($typeId);
         if (empty($type))
-            return ResponseHelper::exception("User-Type not found", 404, true);
+            return ResponseHelper::exception('User-Type not found', 404, true);
 
         // Formata valores da requisição
         $data = \Sanitizer::make(UserTypes::attributesToUpdate($this->request->all()), UserTypes::getRules())->sanitize();
@@ -45,7 +45,7 @@ class UserTypesController extends Controller
         $type->fill($data);
         $type->save();
 
-        return ResponseHelper::success("User-Type updated");
+        return ResponseHelper::success('User-Type updated');
     }
 
     public function show($typeId)
@@ -53,10 +53,10 @@ class UserTypesController extends Controller
         // Verifica se o Tipo de Usuário existe
         $type = UserTypes::find($typeId);
         if (empty($type))
-            return ResponseHelper::exception("User-Type not found", 404, true);
+            return ResponseHelper::exception('User-Type not found', 404, true);
 
         // Retorna o registro do Usuário
-        return ResponseHelper::success("User-Type to show", $type->toArray());
+        return ResponseHelper::success('User-Type to show', $type->toArray());
     }
 
     public function getAll()
@@ -64,7 +64,7 @@ class UserTypesController extends Controller
         // Retorna todos os registros
         $types = UserTypes::all()->toArray();
 
-        return ResponseHelper::success("All user types", $types);
+        return ResponseHelper::success('All user types', $types);
     }
 
     public function delete($typeId)
@@ -72,15 +72,15 @@ class UserTypesController extends Controller
         // Verifica se o Tipo de Usuário existe
         $type = UserTypes::find($typeId);
         if (empty($type))
-            return ResponseHelper::exception("User-Type not found", 404, true);
+            return ResponseHelper::exception('User-Type not found', 404, true);
 
         // Realiza soft delete do Tipo de Usuário
         $removed = UserTypes::destroy($type->id);
 
         // Verifica se o Tipo de Usuário foi deletado
         if ($removed == 0)
-            return ResponseHelper::exception("User-Type not deleted", 402, true);
+            return ResponseHelper::exception('User-Type not deleted', 402, true);
 
-        return ResponseHelper::success("User-Type deleted");
+        return ResponseHelper::success('User-Type deleted');
     }
 }
