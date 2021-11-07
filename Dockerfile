@@ -15,7 +15,7 @@ COPY . /usr/share/nginx
 RUN chmod -R 775 /usr/share/nginx/storage/*
 
 # ALTERAÇÃO DE USUÁRIO E GRUPO DO .DBDOCKER POIS FOI CRIADO PELO DOCKER COM USUÁRIO ROOT:
-RUN chown -R 1000:1000 .dbdocker/
+RUN chown -R 1000:1000 /usr/share/nginx/.dbdocker/
 
 # ALIAS BÁSICOS PARA FACILITAR A CODIFICAÇÃO:
 RUN cd /root/ && echo 'alias ll="ls -lha"' >> .bashrc
