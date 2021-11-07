@@ -87,6 +87,15 @@ class TransactionsController extends Controller
             'balance' => $payeeBalance->balance,
         ]);
 
+        // Simulação envio de email/sms notificando o Payee saobre recebimento
+        $externalUrl = 'http://o4d9z.mocklab.io/notify';
+        $ch = curl_init(); // Inicia o recurso cURL
+        curl_setopt($ch, CURLOPT_URL, $externalUrl); // Define a URL
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Retorna o transfer como string
+        $response = curl_exec($ch); // Executa a URL e retorna como string
+        $response_json = json_decode($response, true); // Converte string em json
+        curl_close($ch); // Encerra o recurso cURL para liberar os recursos do sistema
+
         // Cria o registro da Transação
         Transactions::create($data);
 
@@ -153,6 +162,15 @@ class TransactionsController extends Controller
                 'balance' => $payeeBalance->balance,
             ]);
 
+            // Simulação envio de email/sms notificando o Payee saobre recebimento
+            $externalUrl = 'http://o4d9z.mocklab.io/notify';
+            $ch = curl_init(); // Inicia o recurso cURL
+            curl_setopt($ch, CURLOPT_URL, $externalUrl); // Define a URL
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Retorna o transfer como string
+            $response = curl_exec($ch); // Executa a URL e retorna como string
+            $response_json = json_decode($response, true); // Converte string em json
+            curl_close($ch); // Encerra o recurso cURL para liberar os recursos do sistema
+
         } else {
             // Senão, a diferença é negativa (entrada de dinheiro no saldo do Payer)
 
@@ -166,6 +184,15 @@ class TransactionsController extends Controller
                 'fk_balance' => $payerBalance->id,
                 'balance' => $payerBalance->balance,
             ]);
+
+            // Simulação envio de email/sms notificando o Payer saobre recebimento
+            $externalUrl = 'http://o4d9z.mocklab.io/notify';
+            $ch = curl_init(); // Inicia o recurso cURL
+            curl_setopt($ch, CURLOPT_URL, $externalUrl); // Define a URL
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Retorna o transfer como string
+            $response = curl_exec($ch); // Executa a URL e retorna como string
+            $response_json = json_decode($response, true); // Converte string em json
+            curl_close($ch); // Encerra o recurso cURL para liberar os recursos do sistema
 
             // Retira valor da diferença do saldo do Payee
             $payeeBalance->balance = $currentPayeeBalance - abs($valueDiff);
