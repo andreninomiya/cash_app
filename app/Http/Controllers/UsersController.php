@@ -26,9 +26,15 @@ class UsersController extends Controller
 
         $data = \Sanitizer::make($this->request->all(), Users::getRules())->sanitize();
 
-        $user = Users::where("cpf_cnpj", $data["cpf_cnpj"])->first();
+        $userCpf = Users::where("cpf_cnpj", $data["cpf_cnpj"])->first();
 
-        ResponseHelper::postman($user);
+        if (!empty($userCpf))
+            return ResponseHelper::exception("CPF-CNPJ already registered", 404, true);
+
+        $userEmail = Users::where("email", $data["email"])->first();
+
+        if (!empty($userEmail))
+            return ResponseHelper::exception("Email already registered", 404, true);
 
         $data['password'] = password_hash($data['password'],PASSWORD_DEFAULT);
 
@@ -39,6 +45,8 @@ class UsersController extends Controller
 
     public function update($userId)
     {
+        $user = Users::find($userId);
+
         if (empty($user))
             return ResponseHelper::exception("User not found", 404, true);
 
@@ -80,6 +88,5 @@ class UsersController extends Controller
             return ResponseHelper::exception("User not deleted", 402, true);
 
         return ResponseHelper::success("User deleted");
-
     }
 }

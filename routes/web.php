@@ -38,3 +38,4 @@ $router->put('/transactions/{transactionId}', 'TransactionsController@update');
 $router->get('/transactions', 'TransactionsController@getAll');
 $router->get('/transactions/{transactionId}', 'TransactionsController@show');
 $router->delete('/transactions/{transactionId}', 'TransactionsController@delete');
+$router->post('/transactions/make-transaction', 'TransactionsController@makeTransaction');

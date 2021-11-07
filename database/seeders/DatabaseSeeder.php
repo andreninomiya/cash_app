@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Eloquent\Model;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,6 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call('UsersTableSeeder');
+        Model::unguard();
+        $this->call(UserTypesSeeder::class);
+        $this->call(UsersSeeder::class);
+        $this->call(UserBalancesSeeder::class);
+        Model::reguard();
     }
 }

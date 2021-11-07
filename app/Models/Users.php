@@ -37,7 +37,8 @@ class Users extends Model
             'first_name' => 'trim|escape|capitalize',
             'last_name' => 'trim|escape|capitalize',
             'cpf_cnpj' => 'digit',
-            'email' => 'trim|escape|lowercase'
+            'email' => 'trim|escape|lowercase',
+            'fk_type' => 'digit',
         ];
     }
 

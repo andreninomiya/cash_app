@@ -72,6 +72,5 @@ class UserTypesController extends Controller
             return ResponseHelper::exception("User-Type not deleted", 402, true);
 
         return ResponseHelper::success("User-Type deleted");
-
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Models\UserBalances;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller;
 use App\Models\Transactions;
@@ -72,6 +73,22 @@ class TransactionsController extends Controller
             return ResponseHelper::exception("Transaction not deleted", 402, true);
 
         return ResponseHelper::success("Transaction deleted");
+    }
 
+    public function makeTransaction()
+    {
+        $this->validate($this->request, [
+            "payer" => "required",
+            "payee" => "required",
+            "value" => "required",
+        ]);
+
+        $data = \Sanitizer::make($this->request->all(), Transactions::getRules())->sanitize();
+
+        $userBalance = UserBalances::find($data['payer']);
+
+        ResponseHelper::postman($userBalance);
+
+        return ResponseHelper::success("Transaction realized");
     }
 }

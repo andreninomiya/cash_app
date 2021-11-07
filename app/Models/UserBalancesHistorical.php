@@ -12,6 +12,8 @@ class UserBalancesHistorical extends Model
     protected $table = 'user_balances_historical';
 
     protected $fillable = [
+        'fk_user',
+        'fk_balance',
         'balance',
     ];
 
@@ -28,27 +30,9 @@ class UserBalancesHistorical extends Model
     public static function getRules()
     {
         return [
+            'fk_user' => 'digit',
+            'fk_balance' => 'digit',
             'balance' => 'trim|escape',
         ];
-    }
-
-    public static function attributesToUpdate($fromRequest = [])
-    {
-        $editable = [
-            'balance',
-        ];
-
-        if (empty($fromRequest))
-            return $editable;
-
-        // Setting only attributes from Update
-        $attributesToUpdate = [];
-        foreach ($fromRequest as $column => $value) {
-            if (in_array($column, $editable)) {
-                $attributesToUpdate[$column] = $value;
-            }
-        }
-
-        return $attributesToUpdate;
     }
 }

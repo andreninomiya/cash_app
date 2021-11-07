@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Models\UserBalancesHistorical;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller;
 use App\Models\UserBalances;
@@ -22,7 +23,10 @@ class UserBalancesController extends Controller
 
         $data = \Sanitizer::make($this->request->all(), UserBalances::getRules())->sanitize();
 
-        UserBalances::create($data);
+        $balance = UserBalances::create($data);
+
+        $data["fk_balance"] = $balance->id;
+        UserBalancesHistorical::create($data);
 
         return ResponseHelper::success("User-Balance created");
     }
@@ -35,6 +39,9 @@ class UserBalancesController extends Controller
             return ResponseHelper::exception("User-Balance not found", 404, true);
 
         $data = \Sanitizer::make(UserBalances::attributesToUpdate($this->request->all()), UserBalances::getRules())->sanitize();
+
+        $data["fk_balance"] = $balanceId;
+        UserBalancesHistorical::create($data);
 
         $balance->fill($data);
         $balance->save();
@@ -72,6 +79,5 @@ class UserBalancesController extends Controller
             return ResponseHelper::exception("User-Balance not deleted", 402, true);
 
         return ResponseHelper::success("User-Balance deleted");
-
     }
 }

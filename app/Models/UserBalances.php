@@ -12,6 +12,7 @@ class UserBalances extends Model
     protected $table = 'user_balances';
 
     protected $fillable = [
+        'fk_user',
         'balance',
     ];
 
@@ -28,6 +29,7 @@ class UserBalances extends Model
     public static function getRules()
     {
         return [
+            'fk_user' => 'digit',
             'balance' => 'trim|escape',
         ];
     }
