@@ -22,24 +22,19 @@ Acessar diretório:
 cd cash_app/
 ```
 
-Cópia .env e alteração de valores (apenas com admin):
+Copiar .env e alteração de valores (apenas com admin):
 ``` bash
 cp .env.example .env
 ```
 
-Criação dos Containers:
+Criar Containers:
 ``` bash
 docker compose up -d --build
 ```
 
-Acesso ao Container PHP:
+Acessar Container PHP:
 ``` bash
 docker exec -it cash_php bash
-```
-
-Alterar user:group do diretório .dbdocker:
-``` bash
-chown -R 1000:1000 .dbdocker/
 ```
 
 Composer install:
@@ -48,9 +43,15 @@ composer install
 chown -R 1000:1000 vendor/
 ```
 
-Popular base de dados:
+Alterar user:group do diretório .dbdocker:
 ``` bash
-php artisan migrate --seed
+chown -R 1000:1000 .dbdocker/
+```
+
+Alterar permissão e user:group do diretório storage:
+``` bash
+chmod -R 775 storage/
+chown -R 1000:www-data storage/
 ```
 
 Editar configurações do Nginx para direcionar requisições à `index.php`:
@@ -74,9 +75,19 @@ Y
 Enter
 ```
 
-Reinicar Nginx:
+Reiniciar Containers (`Ctrl + P + Q` ou `New Tab`):
 ``` bash
-/etc/init.d/nginx restart
+docker compose restart
+```
+
+Acessar Container PHP novamente:
+``` bash
+docker exec -it cash_php bash
+```
+
+Popular base de dados:
+``` bash
+php artisan migrate --seed
 ```
 
 ## Collection no Postman
