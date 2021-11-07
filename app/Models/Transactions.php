@@ -12,6 +12,8 @@ class Transactions extends Model
     protected $table = 'transactions';
 
     protected $fillable = [
+        'payer',
+        'payee',
         'value',
     ];
 
