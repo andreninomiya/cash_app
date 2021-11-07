@@ -13,7 +13,7 @@ COPY . /usr/share/nginx
 
 # ALTERAÇÃO DE PERMISSÃO DA PASTA STORAGE PARA EVITAR ERRO DE ACESSO:
 RUN chmod -R 775 /usr/share/nginx/storage/
-RUN chown -R 775 1000:www-data storage/
+RUN chown -R 1000:www-data storage/
 
 # ALIAS BÁSICOS PARA FACILITAR A CODIFICAÇÃO:
 RUN cd /root/ && echo 'alias ll="ls -lha"' >> .bashrc
