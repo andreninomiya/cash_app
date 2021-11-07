@@ -12,7 +12,7 @@ RUN ln -s public html
 COPY . /usr/share/nginx
 
 # ALTERAÇÃO DE PERMISSÃO DA PASTA STORAGE PARA EVITAR ERRO DE ACESSO:
-RUN chmod -R 775 /usr/share/nginx/storage/*
+RUN chmod -R 775 /usr/share/nginx/storage/
 
 # ALIAS BÁSICOS PARA FACILITAR A CODIFICAÇÃO:
 RUN cd /root/ && echo 'alias ll="ls -lha"' >> .bashrc

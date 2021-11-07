@@ -22,9 +22,25 @@ Criação dos Containers:
 docker compose up -d --build
 ```
 
+Cópia .env e alteração de valores (apenas com admin):
+``` bash
+cp .env.example .env
+```
+
 Acesso ao Container PHP:
 ``` bash
 docker exec -it cash_php bash
+```
+
+Alterar user:group do diretório .dbdocker:
+``` bash
+chown -R 1000:1000 .dbdocker/
+```
+
+Composer install:
+``` bash
+composer install
+chown -R 1000:1000 vendor/
 ```
 
 Popular base de dados:
@@ -32,6 +48,31 @@ Popular base de dados:
 php artisan migrate --seed
 ```
 
+Editar configurações do Nginx para direcionar requisições à `index.php`:
+``` bash
+nano /etc/nginx/conf.d/default.conf
+```
+
+Apagar `$uri/index.html` em:
+``` bash
+location / { 
+    # First attempt to serve request as file, then
+    # as directory, then fall back to index.php
+    try_files $uri $uri/ /index.php?$query_string $uri/index.html;
+}
+```
+
+Salvar configurações do Nginx:
+``` bash
+Ctrl + X
+Y
+Enter
+```
+
+Reinicar Nginx:
+``` bash
+/etc/init.d/nginx restart
+```
 
 ## Collection no Postman
 
