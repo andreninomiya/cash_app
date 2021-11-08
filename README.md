@@ -19,7 +19,7 @@ git clone git@github.com:andreninomiya/cash_app.git
 
 Acessar diretório:
 ``` bash
-cd cash_app/
+cd cash_app/services/
 ```
 
 Copiar .env e alteração de valores (apenas com admin):
@@ -40,39 +40,18 @@ docker exec -it cash_php bash
 Composer install:
 ``` bash
 composer install
-chown -R 1000:1000 vendor/
+chown -R 1000:1000 /usr/share/nginx/services/vendor/
 ```
 
 Alterar user:group do diretório .dbdocker:
 ``` bash
-chown -R 1000:1000 .dbdocker/
+chown -R 1000:1000 /usr/share/nginx/.dbdocker/
 ```
 
 Alterar permissão e user:group do diretório storage:
 ``` bash
-chmod -R 775 storage/
-chown -R 1000:www-data storage/
-```
-
-Editar configurações do Nginx para direcionar requisições à `index.php`:
-``` bash
-nano /etc/nginx/conf.d/default.conf
-```
-
-Apagar `$uri/index.html` em:
-``` bash
-location / { 
-    # First attempt to serve request as file, then
-    # as directory, then fall back to index.php
-    try_files $uri $uri/ /index.php?$query_string $uri/index.html;
-}
-```
-
-Salvar configurações do Nginx:
-``` bash
-Ctrl + X
-Y
-Enter
+chmod -R 775 /usr/share/nginx/services/storage/
+chown -R 1000:www-data /usr/share/nginx/services/storage/
 ```
 
 Reiniciar Containers (`Ctrl + P + Q` ou `New Tab`):

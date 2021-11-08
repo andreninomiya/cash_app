@@ -5,8 +5,8 @@ FROM wyveo/nginx-php-fpm:latest
 WORKDIR /usr/share/nginx/
 
 # REMOÇÃO DA PASTA HTML E LINK SIMBÓLICO DA PUBLICK PARA HTML:
-RUN rm -rf /usr/share/nginx/html
-RUN ln -s public html
+RUN rm -rf /usr/share/nginx/src/html
+RUN ln -s /usr/share/nginx/src/public /usr/share/nginx/src/html
 
 # CÓPIA DOS ARQUIVOS DO DIRETÓRIO ATUAL PARA O CONTAINER:
 COPY . /usr/share/nginx
