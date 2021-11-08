@@ -22,9 +22,10 @@ Acessar diretório:
 cd cash_app/src/
 ```
 
-Copiar .env e alteração de valores (apenas com admin):
+Copiar .env:
 ``` bash
 cp .env.example .env
+# Configuração de variáveis apenas com admin
 ```
 
 Criar Containers:
@@ -54,8 +55,9 @@ chmod -R 775 /usr/share/nginx/src/storage/
 chown -R 1000:www-data /usr/share/nginx/src/storage/
 ```
 
-Reiniciar Containers (`Ctrl + P + Q` ou `New Tab`):
+Reiniciar Containers:
 ``` bash
+# 'Ctrl + D' ou 'New Tab' para realizar o próximo passo
 docker compose restart
 ```
 
