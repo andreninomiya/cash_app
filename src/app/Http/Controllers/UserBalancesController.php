@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Models\UserBalancesHistorical;
+use App\Models\Users;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller;
 use App\Models\UserBalances;
@@ -27,6 +28,16 @@ class UserBalancesController extends Controller
         // Formata valores da requisição
         $data = \Sanitizer::make($this->request->all(), UserBalances::getRules())->sanitize();
 
+        // Verifica se o Saldo desse usuário já existe
+        $userBalance = UserBalances::where(["fk_user" => $data['fk_user']])->first();
+        if (!empty($userBalance))
+            return ResponseHelper::exception('User-Balance already exists', 404, true);
+
+        // Verifica se o Usuário existe
+        $user = Users::find($data['fk_user']);
+        if (empty($user))
+            return ResponseHelper::exception('User not found', 404, true);
+
         // Cria o registro do Saldo
         $balance = UserBalances::create($data);
 
@@ -37,10 +48,16 @@ class UserBalancesController extends Controller
         return ResponseHelper::success('User-Balance created');
     }
 
-    public function update($balanceId)
+    public function update($typeId, $id)
     {
+        // Busca o Saldo
+        $balance = $this->searchOne($typeId, $id);
+
+        // Verifica se o Tipo de ID é válido
+        if ($balance == 'invalid')
+            return ResponseHelper::exception('Type not available', 404, true);
+
         // Verifica se o Saldo existe
-        $balance = UserBalances::find($balanceId);
         if (empty($balance))
             return ResponseHelper::exception('User-Balance not found', 404, true);
 
@@ -53,16 +70,22 @@ class UserBalancesController extends Controller
 
         // Cria o registro no histórico de saldo do usuário
         $data['fk_user'] = $balance->fk_user;
-        $data['fk_balance'] = $balanceId;
+        $data['fk_balance'] = $balance->id;
         UserBalancesHistorical::create($data);
 
         return ResponseHelper::success('User-Balance updated');
     }
 
-    public function show($balanceId)
+    public function show($typeId, $id)
     {
+        // Busca o Saldo
+        $balance = $this->search($typeId, $id);
+
+        // Verifica se o Tipo de ID é válido
+        if ($balance == 'invalid')
+            return ResponseHelper::exception('Type not available', 404, true);
+
         // Verifica se o Saldo existe
-        $balance = UserBalances::find($balanceId);
         if (empty($balance))
             return ResponseHelper::exception('User-Balance not found', 404, true);
 
@@ -78,10 +101,16 @@ class UserBalancesController extends Controller
         return ResponseHelper::success('All user balances', $balances);
     }
 
-    public function delete($balanceId)
+    public function delete($typeId, $id)
     {
+        // Busca o Saldo
+        $balance = $this->searchOne($typeId, $id);
+
+        // Verifica se o Tipo de ID é válido
+        if ($balance == 'invalid')
+            return ResponseHelper::exception('Type not available', 404, true);
+
         // Verifica se o Saldo existe
-        $balance = UserBalances::find($balanceId);
         if (empty($balance))
             return ResponseHelper::exception('User-Balance not found', 404, true);
 
@@ -93,5 +122,69 @@ class UserBalancesController extends Controller
             return ResponseHelper::exception('User-Balance not deleted', 402, true);
 
         return ResponseHelper::success('User-Balance deleted');
+    }
+
+    public function getHistory($typeId, $id)
+    {
+        $balanceHistoric = '';
+        $available_types = ['balance', 'user'];
+
+        // Verifica se o Tipo de ID confere com os tipos disponíveis
+        if (!in_array($typeId, $available_types))
+            return ResponseHelper::exception('Type not available', 404, true);
+
+        // Busca Histórico por ID de Saldo
+        if ($typeId == 'balance')
+            $balanceHistoric = UserBalancesHistorical::where('fk_balance', $id)->first();
+
+        // Busca Histórico por ID de Usuário
+        if ($typeId == 'user')
+            $balanceHistoric = UserBalancesHistorical::where('fk_user', $id)->first();
+
+        return ResponseHelper::success('All history balances', $balanceHistoric->toArray());
+    }
+
+    public function search($typeId, $id)
+    {
+        $balance = '';
+        $available_types = ['id', 'user', 'value'];
+
+        // Verifica se o Tipo de ID confere com os tipos disponíveis
+        if (!in_array($typeId, $available_types))
+            return 'invalid';
+
+        // Busca Saldo por ID
+        if ($typeId == 'id')
+            $balance = UserBalances::find($id);
+
+        // Busca Saldo por ID de Usuário
+        if ($typeId == 'user')
+            $balance = UserBalances::where('fk_user', $id)->first();
+
+        // Busca Saldo por Valor
+        if ($typeId == 'value')
+            $balance = UserBalances::where('value', $id)->get();
+
+        return $balance;
+    }
+
+    public function searchOne($typeId, $id)
+    {
+        $balance = '';
+        $available_types = ['id', 'user'];
+
+        // Verifica se o Tipo de ID confere com os tipos disponíveis
+        if (!in_array($typeId, $available_types))
+            return 'invalid';
+
+        // Busca Saldo por ID
+        if ($typeId == 'id')
+            $balance = UserBalances::find($id);
+
+        // Busca Saldo por ID de Usuário
+        if ($typeId == 'user')
+            $balance = UserBalances::where('fk_user', $id)->first();
+
+        return $balance;
     }
 }

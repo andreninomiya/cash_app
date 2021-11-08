@@ -96,16 +96,25 @@ class TransactionsController extends Controller
         $response_json = json_decode($response, true); // Converte string em json
         curl_close($ch); // Encerra o recurso cURL para liberar os recursos do sistema
 
+        if ($response_json['message'] != 'Success')
+            return ResponseHelper::exception('Email-SMS not sended', 404, true);
+
         // Cria o registro da Transação
         Transactions::create($data);
 
         return ResponseHelper::success('Transaction created');
     }
 
-    public function update($transactionId)
+    public function update($typeId, $id)
     {
-        // Verifica se a Transação existe
-        $transaction = Transactions::find($transactionId);
+        // Busca a Transferência
+        $transaction = $this->searchOne($typeId, $id);
+
+        // Verifica se o Tipo de ID é válido
+        if ($transaction == 'invalid')
+            return ResponseHelper::exception('Type not available', 404, true);
+
+        // Verifica se a Transferência existe
         if (empty($transaction))
             return ResponseHelper::exception('Transaction not found', 404, true);
 
@@ -171,6 +180,9 @@ class TransactionsController extends Controller
             $response_json = json_decode($response, true); // Converte string em json
             curl_close($ch); // Encerra o recurso cURL para liberar os recursos do sistema
 
+            if ($response_json['message'] != 'Success')
+                return ResponseHelper::exception('Email-SMS not sended', 404, true);
+
         } else {
             // Senão, a diferença é negativa (entrada de dinheiro no saldo do Payer)
 
@@ -214,10 +226,16 @@ class TransactionsController extends Controller
         return ResponseHelper::success('Transaction updated');
     }
 
-    public function show($transactionId)
+    public function show($typeId, $id)
     {
-        // Verifica se a Transação existe
-        $transaction = Transactions::find($transactionId);
+        // Busca a Transferência
+        $transaction = $this->search($typeId, $id);
+
+        // Verifica se o Tipo de ID é válido
+        if ($transaction == 'invalid')
+            return ResponseHelper::exception('Type not available', 404, true);
+
+        // Verifica se a Transferência existe
         if (empty($transaction))
             return ResponseHelper::exception('Transaction not found', 404, true);
 
@@ -233,10 +251,16 @@ class TransactionsController extends Controller
         return ResponseHelper::success('All transactions', $transactions);
     }
 
-    public function delete($transactionId)
+    public function delete($typeId, $id)
     {
-        // Verifica se a Transação existe
-        $transaction = Transactions::find($transactionId);
+        // Busca a Transferência
+        $transaction = $this->searchOne($typeId, $id);
+
+        // Verifica se o Tipo de ID é válido
+        if ($transaction == 'invalid')
+            return ResponseHelper::exception('Type not available', 404, true);
+
+        // Verifica se a Transferência existe
         if (empty($transaction))
             return ResponseHelper::exception('Transaction not found', 404, true);
 
@@ -248,5 +272,41 @@ class TransactionsController extends Controller
             return ResponseHelper::exception('Transaction not deleted', 402, true);
 
         return ResponseHelper::success('Transaction deleted');
+    }
+
+    public function search($typeId, $id)
+    {
+        $transaction = '';
+        $available_types = ['id', 'payer', 'payee', 'value'];
+
+        // Verifica se o Tipo de ID confere com os tipos disponíveis
+        if (!in_array($typeId, $available_types))
+            return 'invalid';
+
+        // Busca Transação por ID
+        if ($typeId == 'id')
+            $transaction = Transactions::find($id);
+
+        // Busca Transação por ID do Payer
+        if ($typeId == 'payer')
+            $transaction = Transactions::where('payer', $id)->get();
+
+        // Busca Transação por ID do Payee
+        if ($typeId == 'payee')
+            $transaction = Transactions::where('payee', $id)->get();
+
+        // Busca Transação por Valor
+        if ($typeId == 'value')
+            $transaction = Transactions::where('value', $id)->get();
+
+        return $transaction;
+    }
+
+    public function searchOne($typeId, $id)
+    {
+        // Busca Transação por ID
+        ($typeId == 'id') ? $transaction = Transactions::find($id) : $transaction = 'invalid';
+
+        return $transaction;
     }
 }

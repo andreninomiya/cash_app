@@ -48,10 +48,16 @@ class UsersController extends Controller
         return ResponseHelper::success('User created');
     }
 
-    public function update($userId)
+    public function update($id, $typeId)
     {
+        // Busca o Usuário
+        $user = $this->searchOne($typeId, $id);
+
+        // Verifica se o Tipo de ID é válido
+        if ($user == 'invalid')
+            return ResponseHelper::exception('Type not available', 404, true);
+
         // Verifica se o Usuário existe
-        $user = Users::find($userId);
         if (empty($user))
             return ResponseHelper::exception('User not found', 404, true);
 
@@ -65,10 +71,16 @@ class UsersController extends Controller
         return ResponseHelper::success('User updated');
     }
 
-    public function show($userId)
+    public function show($typeId, $id)
     {
-        // Verifica se o Saldo existe
-        $user = Users::find($userId);
+        // Busca o Usuário
+        $user = $this->search($typeId, $id);
+
+        // Verifica se o Tipo de ID é válido
+        if ($user == 'invalid')
+            return ResponseHelper::exception('Type not available', 404, true);
+
+        // Verifica se o Usuário existe
         if (empty($user))
             return ResponseHelper::exception('User not found', 404, true);
 
@@ -84,10 +96,16 @@ class UsersController extends Controller
         return ResponseHelper::success('All users', $users);
     }
 
-    public function delete($userId)
+    public function delete($typeId, $id)
     {
+        // Busca o Usuário
+        $user = $this->searchOne($typeId, $id);
+
+        // Verifica se o Tipo de ID é válido
+        if ($user == 'invalid')
+            return ResponseHelper::exception('Type not available', 404, true);
+
         // Verifica se o Usuário existe
-        $user = Users::find($userId);
         if (empty($user))
             return ResponseHelper::exception('User not found', 404, true);
 
@@ -99,5 +117,57 @@ class UsersController extends Controller
             return ResponseHelper::exception('User not deleted', 402, true);
 
         return ResponseHelper::success('User deleted');
+    }
+
+    public function search($typeId, $id)
+    {
+        $user = '';
+        $available_types = ['id', 'name', 'cpf', 'email'];
+
+        // Verifica se o Tipo de ID confere com os tipos disponíveis
+        if (!in_array($typeId, $available_types))
+            return 'invalid';
+
+        // Busca Usuário por ID
+        if ($typeId == 'id')
+            $user = Users::find($id);
+
+        // Busca Usuário por Nome e Sobrenome
+        if ($typeId == 'name')
+            $user = Users::where('first_name', 'like', '%' . $id . '%')->orWhere('last_name', 'like', '%' . $id . '%')->get();
+
+        // Busca Usuário por CPF/CNPJ
+        if ($typeId == 'cpf' or $typeId == 'cnpj')
+            $user = Users::where('cpf_cnpj', 'like', '%' . $id . '%')->get();
+
+        // Busca Usuário por Email
+        if ($typeId == 'email')
+            $user = Users::where('email', 'like', '%' . $id . '%')->get();
+
+        return $user;
+    }
+
+    public function searchOne($typeId, $id)
+    {
+        $user = '';
+        $available_types = ['id', 'cpf', 'email'];
+
+        // Verifica se o Tipo de ID confere com os tipos disponíveis
+        if (!in_array($typeId, $available_types))
+            return 'invalid';
+
+        // Busca Usuário por ID
+        if ($typeId == 'id')
+            $user = Users::find($id);
+
+        // Busca Usuário por CPF/CNPJ
+        if ($typeId == 'cpf' or $typeId == 'cnpj')
+            $user = Users::where('cpf_cnpj', $id)->first();
+
+        // Busca Usuário por Email
+        if ($typeId == 'email')
+            $user = Users::where('email', $id)->first();
+
+        return $user;
     }
 }

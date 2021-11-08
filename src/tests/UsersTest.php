@@ -27,14 +27,14 @@ class UsersTest extends TestCase
             'last_name' => 'Teste'
         ];
 
-        $response = $this->call('PUT', '/users/1', $formData);
+        $response = $this->call('PUT', '/users/id/1', $formData);
 
         $this->assertEquals(200, $response->status());
     }
 
     public function testShow()
     {
-        $response = $this->call('GET', '/users/1');
+        $response = $this->call('GET', '/users/id/1');
 
         $this->assertEquals(200, $response->status());
     }
@@ -48,7 +48,7 @@ class UsersTest extends TestCase
 
     public function testDelete()
     {
-        $response = $this->call('DELETE', '/users/1');
+        $response = $this->call('DELETE', '/users/id/1');
 
         $this->assertEquals(200, $response->status());
     }

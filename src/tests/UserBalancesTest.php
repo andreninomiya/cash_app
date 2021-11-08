@@ -14,7 +14,7 @@ class UserBalancesTest extends TestCase
 
         $response = $this->call('POST', '/user-balances', $formData);
 
-        $this->assertEquals(200, $response->status());
+        $this->assertEquals(404, $response->status()); // Pois valida se um usuário já tem saldo criado
     }
 
     public function testUpdate()
@@ -23,14 +23,14 @@ class UserBalancesTest extends TestCase
             'balance' => 998
         ];
 
-        $response = $this->call('PUT', '/user-balances/1', $formData);
+        $response = $this->call('PUT', '/user-balances/id/1', $formData);
 
         $this->assertEquals(200, $response->status());
     }
 
     public function testShow()
     {
-        $response = $this->call('GET', '/user-balances/1');
+        $response = $this->call('GET', '/user-balances/id/1');
 
         $this->assertEquals(200, $response->status());
     }
@@ -44,7 +44,14 @@ class UserBalancesTest extends TestCase
 
     public function testDelete()
     {
-        $response = $this->call('DELETE', '/user-balances/1');
+        $response = $this->call('DELETE', '/user-balances/id/1');
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testGetHistory()
+    {
+        $response = $this->call('GET', '/user-balances/history/balance/1');
 
         $this->assertEquals(200, $response->status());
     }

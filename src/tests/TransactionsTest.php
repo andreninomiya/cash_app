@@ -10,7 +10,7 @@ class TransactionsTest extends TestCase
         $formData = [
             'payer' => 1,
             'payee' => 3,
-            'value' => 250.50,
+            'value' => 250,
         ];
 
         $response = $this->call('POST', '/transactions', $formData);
@@ -24,14 +24,14 @@ class TransactionsTest extends TestCase
             'value' => 100
         ];
 
-        $response = $this->call('PUT', '/transactions/1', $formData);
+        $response = $this->call('PUT', '/transactions/id/1', $formData);
 
         $this->assertEquals(200, $response->status());
     }
 
     public function testShow()
     {
-        $response = $this->call('GET', '/transactions/1');
+        $response = $this->call('GET', '/transactions/id/1');
 
         $this->assertEquals(200, $response->status());
     }
@@ -45,7 +45,7 @@ class TransactionsTest extends TestCase
 
     public function testDelete()
     {
-        $response = $this->call('DELETE', '/transactions/1');
+        $response = $this->call('DELETE', '/transactions/id/1');
 
         $this->assertEquals(200, $response->status());
     }

@@ -22,14 +22,14 @@ class UserTypesTest extends TestCase
             'description' => 'Teste2'
         ];
 
-        $response = $this->call('PUT', '/user-types/1', $formData);
+        $response = $this->call('PUT', '/user-types/id/1', $formData);
 
         $this->assertEquals(200, $response->status());
     }
 
     public function testShow()
     {
-        $response = $this->call('GET', '/user-types/1');
+        $response = $this->call('GET', '/user-types/id/1');
 
         $this->assertEquals(200, $response->status());
     }
@@ -43,7 +43,7 @@ class UserTypesTest extends TestCase
 
     public function testDelete()
     {
-        $response = $this->call('DELETE', '/user-types/1');
+        $response = $this->call('DELETE', '/user-types/id/1');
 
         $this->assertEquals(200, $response->status());
     }
