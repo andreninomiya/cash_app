@@ -65,14 +65,22 @@ class TransactionsController extends Controller
         $payerBalance->save();
 
         // Cria o registro no histórico de saldo do Payer
-        $this->saveHistory($data['payee'], $payerBalance->id, $payerBalance->balance);
+        $balanceHistory = $this->saveHistory($data['payee'], $payerBalance->id, $payerBalance->balance);
+
+        // Verifica se o registro histórico foi concluído
+        if (!$balanceHistory)
+            return ResponseHelper::exception('History not saved', 404, true);
 
         // Adiciona valor no saldo do Payee
         $payeeBalance->balance = $currentPayeeBalance + $data['value'];
         $payeeBalance->save();
 
         // Cria o registro no histórico de saldo do Payee
-        $this->saveHistory($data['payee'], $payeeBalance->id, $payeeBalance->balance);
+        $balanceHistory = $this->saveHistory($data['payee'], $payeeBalance->id, $payeeBalance->balance);
+
+        // Verifica se o registro histórico foi concluído
+        if (!$balanceHistory)
+            return ResponseHelper::exception('History not saved', 404, true);
 
         // Simulação envio de email/sms notificando o Payee sobre recebimento
         $notification = $this->callNotificationSender();
@@ -135,14 +143,22 @@ class TransactionsController extends Controller
             $payerBalance->save();
 
             // Cria o registro no histórico de saldo do Payer
-            $this->saveHistory($payerBalance->fk_user, $payerBalance->id, $payerBalance->balance);
+            $balanceHistory = $this->saveHistory($payerBalance->fk_user, $payerBalance->id, $payerBalance->balance);
+
+            // Verifica se o registro histórico foi concluído
+            if (!$balanceHistory)
+                return ResponseHelper::exception('History not saved', 404, true);
 
             // Adiciona valor da diferença no saldo do Payee
             $payeeBalance->balance = $currentPayeeBalance + $valueDiff;
             $payeeBalance->save();
 
             // Cria o registro no histórico de saldo do Payee
-            $this->saveHistory($payeeBalance->fk_user, $payeeBalance->id, $payeeBalance->balance);
+            $balanceHistory = $this->saveHistory($payeeBalance->fk_user, $payeeBalance->id, $payeeBalance->balance);
+
+            // Verifica se o registro histórico foi concluído
+            if (!$balanceHistory)
+                return ResponseHelper::exception('History not saved', 404, true);
 
             // Simulação envio de email/sms notificando o Payee saobre recebimento
             $notification = $this->callNotificationSender();
@@ -158,14 +174,22 @@ class TransactionsController extends Controller
             $payerBalance->save();
 
             // Cria o registro no histórico de saldo do Payer
-            $this->saveHistory($payerBalance->fk_user, $payerBalance->id, $payerBalance->balance);
+            $balanceHistory = $this->saveHistory($payerBalance->fk_user, $payerBalance->id, $payerBalance->balance);
+
+            // Verifica se o registro histórico foi concluído
+            if (!$balanceHistory)
+                return ResponseHelper::exception('History not saved', 404, true);
 
             // Retira valor da diferença do saldo do Payee
             $payeeBalance->balance = $currentPayeeBalance - abs($valueDiff);
             $payeeBalance->save();
 
             // Cria o registro no histórico de saldo do Payee
-            $this->saveHistory($payeeBalance->fk_user, $payeeBalance->id, $payeeBalance->balance);
+            $balanceHistory = $this->saveHistory($payeeBalance->fk_user, $payeeBalance->id, $payeeBalance->balance);
+
+            // Verifica se o registro histórico foi concluído
+            if (!$balanceHistory)
+                return ResponseHelper::exception('History not saved', 404, true);
 
         }
 
