@@ -11,5 +11,9 @@ RUN ln -s public html
 # CÓPIA DOS ARQUIVOS DO DIRETÓRIO ATUAL PARA O CONTAINER:
 COPY . /usr/share/nginx
 
+# ALTERA ARQUIVO DE CONFIGURAÇÃO DO NGINX:
+RUN echo "" >> /etc/nginx/conf.d/default.conf
+ADD support_files/nginx.conf /etc/nginx/conf.d/default.conf
+
 # ALIAS BÁSICOS PARA FACILITAR A CODIFICAÇÃO:
 RUN cd /root/ && echo 'alias ll="ls -lha"' >> .bashrc
