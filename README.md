@@ -19,10 +19,7 @@
 Git Clone:
 ``` bash
 HTTPS:
-git clone https://github.com/andreninomiya/cash_app.git 
-
-SSH:
-git clone git@github.com:andreninomiya/cash_app.git
+git clone https://github.com/andreninomiya/cash_app.git
 ```
 
 Acessar diretório:
