@@ -40,7 +40,7 @@ docker exec -it cash_php bash
 Composer install:
 ``` bash
 composer install
-chown -R 1000:1000 /usr/share/nginx/services/vendor/
+chown -R 1000:1000 /usr/share/nginx/src/vendor/
 ```
 
 Alterar user:group do diretório .dbdocker:
@@ -50,8 +50,8 @@ chown -R 1000:1000 /usr/share/nginx/.dbdocker/
 
 Alterar permissão e user:group do diretório storage:
 ``` bash
-chmod -R 775 /usr/share/nginx/services/storage/
-chown -R 1000:www-data /usr/share/nginx/services/storage/
+chmod -R 775 /usr/share/nginx/src/storage/
+chown -R 1000:www-data /usr/share/nginx/src/storage/
 ```
 
 Reiniciar Containers (`Ctrl + P + Q` ou `New Tab`):
