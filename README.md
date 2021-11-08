@@ -3,7 +3,15 @@
 ![GitHub release (latest by date)](https://img.shields.io/static/v1?label=release&message=v1.0&color=blue)
 ![GitHub release (latest by date)](https://img.shields.io/static/v1?label=status&message=online&color=success)
 
+<img height="120em" src="https://logodownload.org/wp-content/uploads/2018/05/picpay-logo-2.png">
+
 > Serviço de transações financeiras entre Usuários e Lojistas
+
+
+## Descrição
+
+- **Linguagem:** PHP
+- **Framework:** Lumen
 
 
 ## Instalação
