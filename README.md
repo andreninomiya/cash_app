@@ -73,4 +73,4 @@ cd /usr/share/nginx/src && php artisan migrate --seed
 
 ## Collection no Postman
 
-> https://drive.google.com/file/d/1sASfOrqJXuvJXtR5NCrZjIAeQM7_oWTi/view?usp=sharing
+> https://drive.google.com/file/d/1PshQxeUUoHLvDr-AHgL-YEtAtyEbZMIq/view?usp=sharing
