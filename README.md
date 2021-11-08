@@ -18,7 +18,6 @@
 
 Git Clone:
 ``` bash
-HTTPS:
 git clone https://github.com/andreninomiya/cash_app.git
 ```
 
