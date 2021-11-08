@@ -54,15 +54,10 @@ class TransactionsController extends Controller
             return ResponseHelper::exception('Payer-Balance insufficient for transaction', 404, true);
 
         // Executa o serviço autorizador externo
-        $externalUrl = 'https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6';
-        $ch = curl_init(); // Inicia o recurso cURL
-        curl_setopt($ch, CURLOPT_URL, $externalUrl); // Define a URL
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Retorna o transfer como string
-        $response = curl_exec($ch); // Executa a URL e retorna como string
-        $response_json = json_decode($response, true); // Converte string em json
-        curl_close($ch); // Encerra o recurso cURL para liberar os recursos do sistema
+        $authorizer = $this->callExternalAuthorizer();
 
-        if ($response_json['message'] != 'Autorizado')
+        // Verifica se a transferência foi autorizada
+        if ($authorizer != 'Autorizado')
             return ResponseHelper::exception('Unauthorized transaction', 404, true);
 
         // Retira valor do saldo do Payer
@@ -70,33 +65,19 @@ class TransactionsController extends Controller
         $payerBalance->save();
 
         // Cria o registro no histórico de saldo do Payer
-        UserBalancesHistorical::create([
-            'fk_user' => $data['payer'],
-            'fk_balance' => $payerBalance->id,
-            'balance' => $payerBalance->balance,
-        ]);
+        $this->saveHistory($data['payee'], $payerBalance->id, $payerBalance->balance);
 
         // Adiciona valor no saldo do Payee
         $payeeBalance->balance = $currentPayeeBalance + $data['value'];
         $payeeBalance->save();
 
         // Cria o registro no histórico de saldo do Payee
-        UserBalancesHistorical::create([
-            'fk_user' => $data['payee'],
-            'fk_balance' => $payeeBalance->id,
-            'balance' => $payeeBalance->balance,
-        ]);
+        $this->saveHistory($data['payee'], $payeeBalance->id, $payeeBalance->balance);
 
-        // Simulação envio de email/sms notificando o Payee saobre recebimento
-        $externalUrl = 'http://o4d9z.mocklab.io/notify';
-        $ch = curl_init(); // Inicia o recurso cURL
-        curl_setopt($ch, CURLOPT_URL, $externalUrl); // Define a URL
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Retorna o transfer como string
-        $response = curl_exec($ch); // Executa a URL e retorna como string
-        $response_json = json_decode($response, true); // Converte string em json
-        curl_close($ch); // Encerra o recurso cURL para liberar os recursos do sistema
+        // Simulação envio de email/sms notificando o Payee sobre recebimento
+        $notification = $this->callNotificationSender();
 
-        if ($response_json['message'] != 'Success')
+        if ($notification != 'Success')
             return ResponseHelper::exception('Email-SMS not sended', 404, true);
 
         // Cria o registro da Transação
@@ -154,33 +135,19 @@ class TransactionsController extends Controller
             $payerBalance->save();
 
             // Cria o registro no histórico de saldo do Payer
-            UserBalancesHistorical::create([
-                'fk_user' => $payerBalance->fk_user,
-                'fk_balance' => $payerBalance->id,
-                'balance' => $payerBalance->balance,
-            ]);
+            $this->saveHistory($payerBalance->fk_user, $payerBalance->id, $payerBalance->balance);
 
             // Adiciona valor da diferença no saldo do Payee
             $payeeBalance->balance = $currentPayeeBalance + $valueDiff;
             $payeeBalance->save();
 
             // Cria o registro no histórico de saldo do Payee
-            UserBalancesHistorical::create([
-                'fk_user' => $payeeBalance->fk_user,
-                'fk_balance' => $payeeBalance->id,
-                'balance' => $payeeBalance->balance,
-            ]);
+            $this->saveHistory($payeeBalance->fk_user, $payeeBalance->id, $payeeBalance->balance);
 
             // Simulação envio de email/sms notificando o Payee saobre recebimento
-            $externalUrl = 'http://o4d9z.mocklab.io/notify';
-            $ch = curl_init(); // Inicia o recurso cURL
-            curl_setopt($ch, CURLOPT_URL, $externalUrl); // Define a URL
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Retorna o transfer como string
-            $response = curl_exec($ch); // Executa a URL e retorna como string
-            $response_json = json_decode($response, true); // Converte string em json
-            curl_close($ch); // Encerra o recurso cURL para liberar os recursos do sistema
+            $notification = $this->callNotificationSender();
 
-            if ($response_json['message'] != 'Success')
+            if ($notification != 'Success')
                 return ResponseHelper::exception('Email-SMS not sended', 404, true);
 
         } else {
@@ -191,31 +158,14 @@ class TransactionsController extends Controller
             $payerBalance->save();
 
             // Cria o registro no histórico de saldo do Payer
-            UserBalancesHistorical::create([
-                'fk_user' => $payerBalance->fk_user,
-                'fk_balance' => $payerBalance->id,
-                'balance' => $payerBalance->balance,
-            ]);
-
-            // Simulação envio de email/sms notificando o Payer saobre recebimento
-            $externalUrl = 'http://o4d9z.mocklab.io/notify';
-            $ch = curl_init(); // Inicia o recurso cURL
-            curl_setopt($ch, CURLOPT_URL, $externalUrl); // Define a URL
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Retorna o transfer como string
-            $response = curl_exec($ch); // Executa a URL e retorna como string
-            $response_json = json_decode($response, true); // Converte string em json
-            curl_close($ch); // Encerra o recurso cURL para liberar os recursos do sistema
+            $this->saveHistory($payerBalance->fk_user, $payerBalance->id, $payerBalance->balance);
 
             // Retira valor da diferença do saldo do Payee
             $payeeBalance->balance = $currentPayeeBalance - abs($valueDiff);
             $payeeBalance->save();
 
             // Cria o registro no histórico de saldo do Payee
-            UserBalancesHistorical::create([
-                'fk_user' => $payeeBalance->fk_user,
-                'fk_balance' => $payeeBalance->id,
-                'balance' => $payeeBalance->balance,
-            ]);
+            $this->saveHistory($payeeBalance->fk_user, $payeeBalance->id, $payeeBalance->balance);
 
         }
 
@@ -272,6 +222,48 @@ class TransactionsController extends Controller
             return ResponseHelper::exception('Transaction not deleted', 402, true);
 
         return ResponseHelper::success('Transaction deleted');
+    }
+
+    public function saveHistory($userId, $balanceID, $balance)
+    {
+        // Salva registro histórico do Saldo
+        $balanceHistory = UserBalancesHistorical::create([
+            'fk_user' => $userId,
+            'fk_balance' => $balanceID,
+            'balance' => $balance,
+        ]);
+
+        empty($balanceHistory) ? $response = false : $response = true;
+
+        return $response;
+    }
+
+    public function callExternalAuthorizer()
+    {
+        // Executa o serviço autorizador externo
+        $externalUrl = 'https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $externalUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $response = curl_exec($ch);
+        $response_json = json_decode($response, true);
+        curl_close($ch);
+
+        return $response_json['message'];
+    }
+
+    public function callNotificationSender()
+    {
+        // Simulação envio de email/sms notificando o Payer sobre recebimento
+        $externalUrl = 'http://o4d9z.mocklab.io/notify';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $externalUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $response = curl_exec($ch);
+        $response_json = json_decode($response, true);
+        curl_close($ch);
+
+        return $response_json['message'];
     }
 
     public function search($typeId, $id)
