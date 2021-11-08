@@ -39,7 +39,7 @@ docker exec -it cash_php bash
 
 Composer install:
 ``` bash
-composer install
+cd /usr/share/nginx/src && composer install
 chown -R 1000:1000 /usr/share/nginx/src/vendor/
 ```
 
@@ -66,7 +66,7 @@ docker exec -it cash_php bash
 
 Popular base de dados:
 ``` bash
-php artisan migrate --seed
+cd /usr/share/nginx/src && php artisan migrate --seed
 ```
 
 ## Collection no Postman
