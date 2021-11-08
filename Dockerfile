@@ -11,7 +11,7 @@ RUN ln -s /usr/share/nginx/src/public html
 # CÓPIA DOS ARQUIVOS DO DIRETÓRIO ATUAL PARA O CONTAINER:
 COPY . /usr/share/nginx
 
-RUN /usr/share/nginx/src/ composer install
+RUN cd /usr/share/nginx/src/ && composer install
 RUN chown -R 1000:1000 /usr/share/nginx/src/vendor/
 
 RUN chmod -R 775 /usr/share/nginx/src/storage/

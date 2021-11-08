@@ -19,7 +19,7 @@ git clone git@github.com:andreninomiya/cash_app.git
 
 Acessar diretório:
 ``` bash
-cd cash_app/services/
+cd cash_app/src/
 ```
 
 Copiar .env e alteração de valores (apenas com admin):
