@@ -27,6 +27,7 @@ class UserBalancesHistorical extends Model
         'deleted_at',
     ];
 
+    // Formata valores com o Sanitizer
     public static function getRules()
     {
         return [

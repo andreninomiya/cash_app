@@ -6,6 +6,7 @@ class ResponseHelper
 {
     public static function formatResponse(&$message, $format)
     {
+        // Formata as mensagens de Resposta
         if (!$format){
             $message = strtolower($message);
             $message = preg_replace('/ /i', '-', $message);
@@ -29,6 +30,7 @@ class ResponseHelper
 
     public static function success(string $message, array $params = [], int $code = null)
     {
+        // Estrutura o retorno Success
         $response = [
             'success' => true,
             'response' => [
@@ -44,6 +46,7 @@ class ResponseHelper
 
     public static function exception(string $message, int $code, bool $format = false, array $params = [])
     {
+        // Estrutura o retorno Exception
         $response = [
             'success' => false,
             'response' => [
@@ -59,6 +62,7 @@ class ResponseHelper
 
     public static function postman($data, $type='json', $die=true)
     {
+        // Formata o retorno para debug no postman
         if ($type == 'json') {
 
             header("Access-Control-Allow-Origin: *");

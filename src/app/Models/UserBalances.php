@@ -26,6 +26,7 @@ class UserBalances extends Model
         'deleted_at',
     ];
 
+    // Formata valores com o Sanitizer
     public static function getRules()
     {
         return [
@@ -43,7 +44,7 @@ class UserBalances extends Model
         if (empty($fromRequest))
             return $editable;
 
-        // Setting only attributes from Update
+        // Configura apenas atributos de Update
         $attributesToUpdate = [];
         foreach ($fromRequest as $column => $value) {
             if (in_array($column, $editable)) {
