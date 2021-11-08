@@ -4,17 +4,12 @@ FROM wyveo/nginx-php-fpm:latest
 # DIRETÓRIO A SER TRABALHO NO CONTAINER:
 WORKDIR /usr/share/nginx/
 
-# REMOÇÃO DA PASTA HTML:
+# REMOÇÃO DA PASTA HTML E LINK SIMBÓLICO DA PUBLICK PARA HTML:
 RUN rm -rf /usr/share/nginx/src/html
+RUN ln -s /usr/share/nginx/src/public html
 
 # CÓPIA DOS ARQUIVOS DO DIRETÓRIO ATUAL PARA O CONTAINER:
 COPY . /usr/share/nginx
-
-# LINK SIMBÓLICO DA PUBLIC PARA HTML:
-RUN ln -s /usr/share/nginx/src/public html
-
-RUN chmod -R 775 /usr/share/nginx/src/storage/
-RUN chown -R 1000:www-data /usr/share/nginx/src/storage/
 
 # ALTERA ARQUIVO DE CONFIGURAÇÃO DO NGINX:
 RUN echo "" >> /etc/nginx/conf.d/default.conf
