@@ -7,7 +7,7 @@ class ResponseHelper
     public static function formatResponse(&$message, $format)
     {
         // Formata as mensagens de Resposta
-        if (!$format){
+        if (!$format) {
             $message = strtolower($message);
             $message = preg_replace('/ /i', '-', $message);
             $message = preg_replace('/\./i', '', $message);
@@ -28,7 +28,7 @@ class ResponseHelper
         return $arr[0] . "." . $response;
     }
 
-    public static function success(string $message, array $params = [], int $code = null)
+    public static function success($message, $params = [], $code = null)
     {
         // Estrutura o retorno Success
         $response = [
@@ -44,7 +44,7 @@ class ResponseHelper
             ->json($response, (isset($code)) ? $code : 200);
     }
 
-    public static function exception(string $message, int $code, bool $format = false, array $params = [])
+    public static function exception($message, $code, $format = false, $params = [])
     {
         // Estrutura o retorno Exception
         $response = [
@@ -60,7 +60,7 @@ class ResponseHelper
             ->json($response, ($code) ? $code : 500);
     }
 
-    public static function postman($data, $type='json', $die=true)
+    public static function postman($data, $type = 'json', $die = true)
     {
         // Formata o retorno para debug no postman
         if ($type == 'json') {

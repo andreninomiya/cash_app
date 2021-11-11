@@ -34,7 +34,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../service_bus" />
     <property name="settings.editor.selected.configurable" value="web-ide.project.structure" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -62,7 +62,10 @@
       <option name="presentableId" value="Default" />
       <updated>1636206401671</updated>
       <workItem from="1636206403491" duration="59143000" />
-      <workItem from="1636371371030" duration="5673000" />
+      <workItem from="1636371371030" duration="7360000" />
+      <workItem from="1636472186266" duration="1189000" />
+      <workItem from="1636477066592" duration="7000" />
+      <workItem from="1636581768038" duration="4839000" />
     </task>
     <servers />
   </component>
